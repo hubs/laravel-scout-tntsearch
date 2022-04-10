@@ -231,12 +231,26 @@ class TNTSearchEngine extends Engine
 
         $query = $this->applyOrders($query);
 
+        $query  =   $this->applySelect($query);
+
         $models = is_null($callback) ? $query->get() : $callback($query);
 
         return empty($this->builder->orders) ? $models->sortBy(function ($model) use ($results) {
             return array_search($model->getKey(), $results['ids']);
         })->values() : $models;
     }
+
+    public $field = [];
+    public function setSelectField(...$params){
+        $this->field = $params;
+    }
+    protected function applySelect($query){
+        if($this->field){
+            $query->select($this->field);
+        }
+        return $query;
+    }
+
 
     /**
      * Determine if the given model uses soft deletes.
